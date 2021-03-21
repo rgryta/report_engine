@@ -1,13 +1,16 @@
 import java.sql.*;
 
 public class ReportManager {
-    private static final String driverName="oracle.jdbc.driver.OracleDriver";
+    public String driverName="oracle.jdbc.driver.OracleDriver";
+    public String conUrl="jdbc:oracle:thin:@localhost:1521/orclpdb";
+    public String conUser="rgryta";
+    public String conPswd="123456";
 
-    private static final String conUrl="jdbc:oracle:thin:@localhost:1521/orclpdb";
-    private String conUser="rgryta";
-    private String conPswd="123456";
+    public String sourceSQL = "select order_id,item_id,quantity from order_items";
+    public String[] PK = {"order_id","item_id"};
 
-    private String sourceSQL = "select order_id,item_id,quantity from order_items";
+    public int threadRows;
+
 
     public void initialize(){
         try {
@@ -19,14 +22,18 @@ public class ReportManager {
                     "select count(*) as rowcount from source");
             rs.next();
             float rowCount = rs.getFloat("rowcount");
+            int threadNo = 10;
+            threadRows = (int)Math.ceil(rowCount/(float)threadNo);
 
-            float sheetRows = 100;
-            int sheetNo = (int) Math.ceil(rowCount/sheetRows);
-
-            System.out.println(rowCount);
-            DataExtractor de = new DataExtractor(driverName,conUrl,conUser,conPswd,sourceSQL);
-            de.start();
-        } catch (ClassNotFoundException|SQLException e) {
+            DataExtractor[] extractors = new DataExtractor[threadNo];
+            for (int i=0;i<threadNo;i++) {
+                extractors[i] = new DataExtractor(this,i);
+                extractors[i].start();
+            }
+            for (int i=0;i<threadNo;i++) {
+                extractors[i].join();
+            }
+        } catch (ClassNotFoundException|SQLException|InterruptedException e) {
             e.printStackTrace();
         }
     }
