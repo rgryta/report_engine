@@ -37,7 +37,7 @@ public class XLSXManager {
 
             SXSSFRow row = sh.createRow(i);
             SXSSFCell cell;
-            cell = row.createCell(0, CellType.NUMERIC);
+            cell = row.createCell(0, CellType.STRING);
             cell.setCellValue(i/1000);
 
             // if it's the 1st row then get the value to the supporting variable
@@ -82,8 +82,6 @@ public class XLSXManager {
             out = new FileOutputStream(file);
             wb.write(out);
             out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

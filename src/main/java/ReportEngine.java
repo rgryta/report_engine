@@ -16,8 +16,8 @@ import java.io.IOException;
 public class ReportEngine {
 
     public static void main(String[] args) {
-        DataExtractor de = new DataExtractor();
-        de.connect();
+        ReportManager rm = new ReportManager();
+        rm.initialize();
     }
 
 }
