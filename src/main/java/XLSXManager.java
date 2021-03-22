@@ -56,6 +56,7 @@ public class XLSXManager {
                 }
 
             }
+            input.close();
             fis.close();
             //noinspection ResultOfMethodCallIgnored
             fileIn.delete();
