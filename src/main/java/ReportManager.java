@@ -36,6 +36,8 @@ public class ReportManager {
         } catch (ClassNotFoundException|SQLException|InterruptedException e) {
             e.printStackTrace();
         }
+        XLSXManager manager = new XLSXManager();
+        manager.create_datasheet();
     }
 
 }

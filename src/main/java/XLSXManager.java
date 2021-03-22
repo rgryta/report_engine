@@ -4,19 +4,15 @@ import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class XLSXManager {
 
     public boolean create_datasheet(){
         String filePath = System.getProperty("user.dir");
         File file = new File(filePath + File.separator + "test.xlsx");
-        if (file.exists()) {
+        if (file.exists()) //noinspection ResultOfMethodCallIgnored
             file.delete();
-        }
 
         System.setProperty("java.io.tmpdir", filePath); //path for SXSSF temporary files
 
@@ -29,52 +25,43 @@ public class XLSXManager {
         sh.groupColumn(1,60); //range of system columns (first column has to be skipped so: +1)
         sh.groupColumn(62,99);
 
-        int counter=0;
-        int lastIdx=0;
-        double cellValue = 0;
-
-        for (int i = 0; i < 10000; i++){
-
-            SXSSFRow row = sh.createRow(i);
-            SXSSFCell cell;
-            cell = row.createCell(0, CellType.STRING);
-            cell.setCellValue(i/1000);
-
-            // if it's the 1st row then get the value to the supporting variable
-            // change to array if grouping done by multiple columns
-            if (i==0) cellValue = cell.getNumericCellValue();
-
-            // check if we're still iterating over a new group
-            if (cellValue!=cell.getNumericCellValue()){
-                // if it's a new group and there are more than 1 rows within
-                // the group then group the group and set new lastIdx
-                if (counter!=1){
-                    cellValue = cell.getNumericCellValue();
-                    sh.groupRow(lastIdx+1,i-1); //groups have to start from the 2nd row in a group in excel
-                    lastIdx=i;
-                }
-                counter=1;
-            }
-            else {
-                counter++;
-            }
-
-            for (int j = 1; j < 100; j++) {
-                cell = row.createCell(j, CellType.NUMERIC);
-                cell.setCellValue((i+j)%100);
-            }
-
-            if ((i%120==0)&&(i!=0)) {
+        int rowno=0;
+        try {
+        for (int i = 0; i < 10; i++) {
+            File fileIn = new File(filePath + File.separator + "test_" + i + ".tmp");
+            FileInputStream fis = new FileInputStream(fileIn);
+            boolean cont = true;
+            ObjectInputStream input = new ObjectInputStream(fis);
+            while (cont) {
                 try {
-                    if (counter!=1) {
-                        sh.groupRow(lastIdx + 1, i);
-                        lastIdx = i;
+                    SQLRecord obj = (SQLRecord)input.readObject();
+
+                    SXSSFRow row = sh.createRow(rowno++);
+                    SXSSFCell cell;
+
+
+
+                    for (int j = 0; j < 3; j++) {
+                        cell = row.createCell(j, CellType.STRING);
+                        cell.setCellValue(obj.columnValues[j]);
                     }
+
                     sh.flushRows();
-                } catch (IOException e) {
+
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
+                catch(EOFException e){
+                    cont = false;
+                }
+
             }
+            fis.close();
+            //noinspection ResultOfMethodCallIgnored
+            fileIn.delete();
+        }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         FileOutputStream out;

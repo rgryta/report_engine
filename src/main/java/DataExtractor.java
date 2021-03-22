@@ -1,5 +1,7 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.ObjectOutputStream;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,8 +43,8 @@ public class DataExtractor extends Thread{
             File file = new File(filePath + File.separator + "test_"+ extractorID +".tmp");
             if (file.exists()) //noinspection ResultOfMethodCallIgnored
                 file.delete();
-            FileWriter writer = new FileWriter(file);
-
+            FileOutputStream writer = new FileOutputStream(file);
+            ObjectOutputStream out = new ObjectOutputStream(writer);
 
             ResultSetMetaData md = rs.getMetaData();
 
@@ -50,19 +52,20 @@ public class DataExtractor extends Thread{
             DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             int columnsNo = md.getColumnCount();
 
-            String[] row;
+            SQLRecord row;
             while(rs.next()) {
-                row = new String[columnsNo];
+                row = new SQLRecord(columnsNo);
                 for (int i = 1; i <= columnsNo; i++)
                     switch (md.getColumnType(i)) {
-                        case Types.DATE -> row[i - 1] = dateFormat.format(rs.getDate(i));
-                        case Types.TIMESTAMP -> row[i - 1] = timestampFormat.format(rs.getTimestamp(i));
-                        default -> row[i - 1] = rs.getString(i);
+                        case Types.DATE -> row.columnValues[i - 1] = dateFormat.format(rs.getDate(i));
+                        case Types.TIMESTAMP -> row.columnValues[i - 1] = timestampFormat.format(rs.getTimestamp(i));
+                        default -> row.columnValues[i - 1] = rs.getString(i);
                     }
-                writer.write(String.join(";",row)+System.lineSeparator());
+                out.writeObject(row);
             }
 
             con.close();
+            out.close();
             writer.close();
         }
         catch (Exception e){
