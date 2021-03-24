@@ -24,6 +24,7 @@ public class XLSXManager {
 
         sh.groupColumn(1,60); //range of system columns (first column has to be skipped so: +1)
         sh.groupColumn(62,99);
+        sh.groupColumn(10,60);
 
         int rowno=0;
         try {

@@ -21,6 +21,7 @@ public class ReportManager {
             ResultSet rs=stmt.executeQuery("with source as ("+sourceSQL+")" +
                     "select count(*) as rowcount from source");
             rs.next();
+
             float rowCount = rs.getFloat("rowcount");
             int threadNo = 10;
             threadRows = (int)Math.ceil(rowCount/(float)threadNo);
