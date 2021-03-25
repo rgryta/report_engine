@@ -16,8 +16,9 @@ import java.io.IOException;
 public class ReportEngine {
 
     public static void main(String[] args) {
-        ReportManager rm = new ReportManager();
-        rm.initialize();
+        //ReportManager rm = new ReportManager();
+        //rm.initialize();
+
     }
 
 }

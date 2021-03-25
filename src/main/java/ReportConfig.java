@@ -1,31 +1,26 @@
-import org.apache.poi.ss.usermodel.CellType;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReportConfig {
-    public Map<String,CellType> typeColumnGroups = new HashMap<>();
+    public List<ReportCell> cells;
     public int[][] hideColumns;
     public String[][] groupingColumns;
 
     ReportConfig(){
-        String[] sourceColumns = {"a","b"};
-        CellType[] sourceTypes = {CellType.STRING,CellType.STRING};
-        String[] targetColumns = {"c","d"};
-        CellType[] targetTypes = {CellType.STRING,CellType.STRING};
-        String[] comparisonColumns = {"e","f","g"};
-        CellType[] comparisonTypes = {CellType.STRING,CellType.STRING,CellType.STRING};
+        cells = new ArrayList<>();
 
-        for (int i=0;i<=sourceColumns.length;i++) typeColumnGroups.put(sourceColumns[i],sourceTypes[i]);
-        for (int i=0;i<=sourceColumns.length;i++) typeColumnGroups.put(targetColumns[i],targetTypes[i]);
-        for (int i=0;i<=sourceColumns.length;i++) typeColumnGroups.put(comparisonColumns[i],comparisonTypes[i]);
+        cells.add(new ReportCell("order_id"));
+        cells.add(new ReportCell("item_id"));
+        cells.add(new ReportCell("quantity"));
 
-        hideColumns = new int[3][];
-        hideColumns[0] = new int[]{1, 1};
-        hideColumns[1] = new int[]{1, 1};
-        hideColumns[2] = new int[]{1, 2};
+        hideColumns = new int[3][2];
+        hideColumns[0] = new int[]{0, 2};
+        hideColumns[1] = new int[]{1, 2};
+        hideColumns[2] = new int[]{2, 2};
 
-
+        groupingColumns = new String[2][];
+        groupingColumns[0] = new String[]{"order_id"};
+        groupingColumns[1] = new String[]{"item_id"};
 
     }
 }
